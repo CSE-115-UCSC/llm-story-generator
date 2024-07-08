@@ -44,9 +44,8 @@ function Conversation() {
       display="center"
       justifyContent="center"
       alignItems="center"
-      //sx={{ bgcolor: 'grey' }}
       >
-        <p>How Can I Help You?</p>
+        <p>How can I help you today?</p>
       </Box>
       <PromptField/>
     </Stack>
