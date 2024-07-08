@@ -3,21 +3,57 @@ import { Fragment, useState, ChangeEvent } from 'react';
 import Paper from '@mui/material/Paper';
 import InputBase from '@mui/material/InputBase';
 import IconButton from '@mui/material/IconButton';
+import Stack from '@mui/material/Stack';
+import Box from '@mui/material/Box';
 
+import { ThemeProvider, createTheme } from '@mui/material/styles';
 import './App.css';
+
+const theme = createTheme({
+  components: {
+    MuiStack: {
+      defaultProps: {
+        useFlexGap: true,
+      },
+    },
+  },
+});
 
 function App() {
   
   return (
-    <div className="App">
-      <header className="App-header">
-        <CustomizedInputBase/>
-      </header>
+    <div>
+      <ThemeProvider theme={theme}>
+        <Conversation/>
+      </ThemeProvider>
     </div>
+
   );
 }
 
-function CustomizedInputBase() {
+function Conversation() {
+  return (
+    <Stack
+      direction="column"
+      justifyContent="flex-start"
+      alignItems="center"
+      spacing={0.5}
+    >
+      <Box height={400}
+      width={400}
+      display="center"
+      justifyContent="center"
+      alignItems="center"
+      //sx={{ bgcolor: 'grey' }}
+      >
+        <p>How Can I Help You?</p>
+      </Box>
+      <PromptField/>
+    </Stack>
+  );
+}
+
+function PromptField() {
   const [prompt, setPrompt] = useState("def");
 
   const handleSubmit = (e) => {
@@ -29,7 +65,6 @@ function CustomizedInputBase() {
 
   return (
     <Fragment>
-    {prompt}
     <Paper
       component="form"
       onSubmit={handleSubmit}
