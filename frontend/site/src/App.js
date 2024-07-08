@@ -1,4 +1,4 @@
-import { Fragment, useState, ChangeEvent } from 'react';
+import { Fragment, useState, useCallback } from 'react';
 
 import Paper from '@mui/material/Paper';
 import InputBase from '@mui/material/InputBase';
@@ -20,7 +20,6 @@ const theme = createTheme({
 });
 
 function App() {
-  
   return (
     <div>
       <ThemeProvider theme={theme}>
@@ -32,6 +31,13 @@ function App() {
 }
 
 function Conversation() {
+  const [prompt, setPrompt] = useState("");
+
+  // wrap the hook and pass the function name to the prompt field
+  const wrapperSetPrompt = useCallback(prompt => {
+    setPrompt(prompt);
+  }, [setPrompt]);
+
   return (
     <Stack
       direction="column"
@@ -47,17 +53,17 @@ function Conversation() {
       >
         <p>How can I help you today?</p>
       </Box>
-      <PromptField/>
+      <p>{prompt}</p>
+      <PromptField submitPrompt={wrapperSetPrompt}/>
     </Stack>
   );
 }
 
-function PromptField() {
-  const [prompt, setPrompt] = useState("def");
+function PromptField({submitPrompt}) {
 
   const handleSubmit = (e) => {
-    console.log('submit called');
-    setPrompt(e.target[0].value)
+    submitPrompt(e.target[0].value)
+    e.target[0].value = ""
     e.preventDefault()
     // we need to add the flask api call here.
   }
@@ -72,6 +78,7 @@ function PromptField() {
       <InputBase
         sx={{ ml: 1, flex: 1}}
         placeholder="Message Veracity"
+        
       />
       <IconButton type="submit" sx={{ p: '10px'}} aria-label="menu">
       </IconButton>
