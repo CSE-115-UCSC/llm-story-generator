@@ -10,7 +10,7 @@ app = Flask(__name__)
 story_manager = story.StoryManager()
 
 # Route to generate a new chapter
-@app.route('/generate_chapter', methods=['POST'])
+@app.route('chapter/{number}/generate', methods=['POST'])
 def generate_chapter():
     data = request.json
     prompt = data.get('prompt')
@@ -22,7 +22,7 @@ def generate_chapter():
     return Response(stream_with_context(story_manager.generate_chapter_streaming(prompt, clear_previous)), content_type='text/plain')
 
 # Route to regenerate an existing chapter
-@app.route('/regenerate_chapter', methods=['POST'])
+@app.route('chapter/{number}/regenerate', methods=['POST'])
 def regenerate_chapter():
     data = request.json
     chapter_num = data.get('chapter_num')
@@ -32,6 +32,29 @@ def regenerate_chapter():
         return jsonify({"error": "Chapter number and prompt are required"}), 400
 
     return Response(stream_with_context(story_manager.regenerate_chapter(chapter_num, prompt)), content_type='text/plain')
+
+# Route to fetch a specific chapter
+@app.route('/chapter/{number}', methods=['GET'])
+def get_chapters():
+    return jsonify({"chapters": story_manager.chapter.get_all()})
+
+# Route to fetch a specific summary
+@app.route('/chapter/{number}/summary', methods=['GET'])
+def get_summaries():
+    return jsonify({"summaries": story_manager.summary.get_all()})
+
+# Route to fetch a specific character
+@app.route('/chapter/{number}/character', methods=['GET'])
+def get_characters():
+    return jsonify({"characteristics": story_manager.character.get_all()})
+
+# Route to clear data of a chapter
+@app.route('/chapter/{number}/clear', methods=['POST'])
+def clear_data():
+    story_manager.__init__()
+    return jsonify({"status": "Cleared all stored data"})
+
+#these might be outdated since they do all 
 
 # Route to fetch all chapters
 @app.route('/chapters', methods=['GET'])
