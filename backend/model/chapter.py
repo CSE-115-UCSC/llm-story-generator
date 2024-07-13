@@ -36,4 +36,3 @@ class Chapter:
     # def get_all(self):
     #     formatted_chapters = {f"Chapter {idx + 1}": re.sub(r'Chapter \d+: .*?(\n|$)', '', chapter).strip() for idx, chapter in enumerate(self.chapters)}
     #     return formatted_chapters
-

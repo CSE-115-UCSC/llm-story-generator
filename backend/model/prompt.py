@@ -1,8 +1,17 @@
 # Class to handle prompt enhancement
 class Prompt:
     def __init__(self, number: int, text: str):
-        self.text = text
+        self.user_text = text
         self.number = number
+
+    def text(self):
+        return self.text
+    
+    def chapter(self):
+        return self.number
+    
+    def message(self, summary: str, characters: dict):
+        return f"Previously on the story: {summary}\n\nCharacters and their traits:\n{characters}\n\n{self.user_text}"
 
     # @staticmethod
     # def enhance(prompt, summaries, characteristics):

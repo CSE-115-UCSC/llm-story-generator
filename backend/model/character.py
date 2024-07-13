@@ -7,6 +7,12 @@ class Character:
         self.traits = traits
         self.name = name
 
+    def traits(self):
+        return self.traits
+    
+    def name(self):
+        return self.name
+
     # # To extract character traits from a chapter
     # def extract(self, chapter):
     #     # Prompt for extracting character traits from the text

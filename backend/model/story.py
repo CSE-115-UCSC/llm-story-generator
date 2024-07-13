@@ -1,8 +1,8 @@
 from typing import List
 
-from backend.model.prompt import Prompt
-from backend.model.chapter import Chapter
-from backend.model.character import Character
+from model.prompt import Prompt
+from model.chapter import Chapter
+from model.character import Character
 
 class Story:
     def __init__(self, name = None):
@@ -25,7 +25,7 @@ class Story:
         return self.characters[number][name]
     
     def set_prompt(self, number: int, message: str):
-        # add a new prompt 
+        # add a new prompt
         p = Prompt(number, message)
         self.prompts.append(p)
 
