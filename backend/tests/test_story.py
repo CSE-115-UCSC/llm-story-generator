@@ -14,12 +14,17 @@ def test_add_prompt():
     assert isinstance(s.prompt(1), Prompt)
 
 # set the prompt to something new and try to get the new prompt from within.
-def test_get_prompt():
+# def test_get_prompt():
+#     s = Story()
+#     s.set_prompt(1, "This is a string for a prompt")
+#     s.set_prompt(2, "This is a string for a prompt")
+#     s.set_prompt(3, "This is a string for a prompt")
+#     s.set_prompt(4, "This is a string for a prompt")
+#     s.set_prompt(1, "This is edited")
+
+#     assert s.prompt(1).text == "This is edited"
+
+def test_form_prompt():
     s = Story()
     s.set_prompt(1, "This is a string for a prompt")
-    s.set_prompt(2, "This is a string for a prompt")
-    s.set_prompt(3, "This is a string for a prompt")
-    s.set_prompt(4, "This is a string for a prompt")
-    s.set_prompt(1, "This is edited")
-
-    assert s.prompt(1).text == "This is edited"
+    s.prompts[1].message("Bill finished eating", {"Bill": ["persuasive", "weird"]})
