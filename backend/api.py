@@ -2,12 +2,12 @@
 import openai
 from flask import Flask, request, jsonify, Response, stream_with_context
 
-import story
+from backend.model.story import Story
 
 app = Flask(__name__)
 
 # Initializing the StoryManager instance
-story_manager = story.StoryManager()
+story_manager = Story()
 
 # Route to generate a new chapter
 @app.route('chapter/{number}/generate', methods=['POST'])
