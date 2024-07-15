@@ -3,16 +3,16 @@ from openai import OpenAI
 
 # what manages our API resources and server
 from flask import Flask, request, jsonify, Response, stream_with_context
-from flask_cors import CORS, cross_origin
+from flask_cors import CORS
 import dotenv # for env vars
+import logging
 
 # our model
 from model.story import Story
 
 app = Flask(__name__)
-
-# CORS config
-CORS(app)
+CORS(app) # lax CORS confif
+logging.basicConfig(level=logging.INFO)
 
 dotenv.load_dotenv()
 llm = OpenAI()
@@ -20,46 +20,36 @@ llm = OpenAI()
 # Initializing the StoryManager instance
 story_manager = Story()
 
+
 # Route to generate a new chapter
-@app.route('/chapter/<int:chapter>', methods=['GET'])
+@app.route('/chapter/<int:chapter>', methods=["GET", "POST"])
 def generate_chapter(chapter: int):
-    # if request.method == 'POST':
-    #     data = request.json
-    #     prompt = data.get('prompt')
-    #     clear_previous = data.get('clear_previous', False)
-    #     if not prompt:
-    #         return jsonify({"error": "Prompt is required"}), 400
-    #     return Response(stream_with_context(story_manager.generate_chapter_streaming(prompt, clear_previous)), content_type='text/plain')
-    
-    #elif request.method == 'GET':
-    # def generate():
-    #     yield '<p>Hello '
-    #     yield escape(request.args['name'])
-    #     yield '!</p>'
-    # return stream_with_context(generate())
-    def g(chapter):
-        openai_stream = llm.chat.completions.create(
-            model="gpt-3.5-turbo",
-            messages=[{"role": "user", "content": "who is ChatGPT in 500 words."}],
-            temperature=0.1,
-            stream=True,
-        )
-        text = ""
-        for chunk in openai_stream:
-            if chunk.choices[0].delta.content is not None:
-                text += chunk.choices[0].delta.content
-                yield chunk.choices[0].delta.content
-        story_manager.set_chapter(chapter, text)
-
-    return Response(stream_with_context(g(chapter)), content_type='text/event-stream')
-
+    if request.method == "POST":
+        def g(chapter):
+            data = request.json
+            query = data.get('query')
+            openai_stream = llm.chat.completions.create(
+                model="gpt-3.5-turbo",
+                messages=[{"role": "user", "content": query}],
+                temperature=0.1,
+                stream=True,
+            )
+            text = ""
+            for chunk in openai_stream:
+                if chunk.choices[0].delta.content is not None:
+                    text += chunk.choices[0].delta.content
+                    yield chunk.choices[0].delta.content
+            story_manager.set_chapter(chapter, text)
+            story_manager.set_prompt(chapter, query)
+        return Response(stream_with_context(g(chapter)), content_type='text/event-stream')
+        
     
 # Route to regenerate an existing chapter
-@app.route('/chapter/<int:chapter>', methods=['POST'])
-def regenerate_chapter(chapter: int):
-    data = request.json
-    prompt = data.get('prompt')
-    print(prompt)
+# @app.route('/chapter/<int:chapter>', methods=['POST'])
+# def regenerate_chapter(chapter: int):
+#     data = request.json
+#     prompt = data.get('prompt')
+#     print(prompt)
 #     if not chapter_num or not prompt:
 #         return jsonify({"error": "Chapter number and prompt are required"}), 400
 
