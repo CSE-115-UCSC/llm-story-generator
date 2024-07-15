@@ -1,19 +1,19 @@
 // src/Chat.js
 import React, { useState, useEffect, useRef } from 'react';
-import { Box, InputBase, IconButton, Typography, Paper, styled } from '@mui/material';
+import { Box, InputBase, IconButton, Typography, Paper, styled, useTheme } from '@mui/material';
 import SendIcon from '@mui/icons-material/Send';
 import SmartToyIcon from '@mui/icons-material/SmartToy';
 import PersonIcon from '@mui/icons-material/Person';
 
-const ChatContainer = styled(Paper)({
-  width: '50%',
-  backgroundColor: '#ffffff',
+const ChatContainer = styled(Paper)(({ theme }) => ({
+  width: '100%', // 占用整个父容器的宽度
+  height: '100%', // 占用整个父容器的高度
+  backgroundColor: theme.palette.background.default,
   display: 'flex',
   flexDirection: 'column',
   justifyContent: 'space-between',
   boxSizing: 'border-box',
-  height: '100%',
-});
+}));
 
 const ChatMessages = styled(Box)({
   flexGrow: 1,
@@ -27,34 +27,37 @@ const ChatMessageContainer = styled(Box)({
   margin: '10px 0',
 });
 
-const ChatMessage = styled(Box)(({ user }) => ({
+const ChatMessage = styled(Box)(({ user, theme }) => ({
   display: 'flex',
   alignItems: 'center',
   marginLeft: '8px',
   padding: '10px',
   borderRadius: '5px',
-  backgroundColor: user ? '#007BFF' : '#f0f0f0',
-  color: user ? '#ffffff' : '#000000',
+  backgroundColor: user ? theme.palette.custom.messageBubble.user.background : theme.palette.custom.messageBubble.bot.background,
+  color: user ? theme.palette.custom.messageBubble.user.text : theme.palette.custom.messageBubble.bot.text,
   maxWidth: '80%',
 }));
 
-const ChatInputContainer = styled(Box)({
+const ChatInputContainer = styled(Box)(({ theme }) => ({
   display: 'flex',
   alignItems: 'center',
   padding: '10px',
-  borderTop: '1px solid #ccc',
-  backgroundColor: '#fff',
-});
+  borderTop: `1px solid ${theme.palette.divider}`,
+  backgroundColor: theme.palette.background.default,
+}));
 
-const StyledInputBase = styled(InputBase)({
+const StyledInputBase = styled(InputBase)(({ theme }) => ({
   flexGrow: 1,
   padding: '10px',
   borderRadius: '20px',
-  backgroundColor: '#f0f0f0',
+  backgroundColor: theme.palette.custom.inputField.background,
   marginRight: '10px',
-});
+  color: theme.palette.custom.inputField.text,
+}));
 
 function Chat() {
+  const theme = useTheme(); // 使用 useTheme 钩子获取主题
+
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
   const messagesEndRef = useRef(null);
@@ -88,7 +91,7 @@ function Chat() {
         } else {
           clearInterval(interval);
         }
-      }, 100); // Speed up the typing effect
+      }, 25); // Speed up the typing effect
     }, 500);
   };
 
@@ -103,7 +106,7 @@ function Chat() {
       <ChatMessages>
         {messages.map((message, index) => (
           <ChatMessageContainer key={index}>
-            {message.user ? <PersonIcon /> : <SmartToyIcon />}
+            {message.user ? <PersonIcon style={{ color: theme.palette.custom.icons.user }} /> : <SmartToyIcon style={{ color: theme.palette.custom.icons.bot }} />}
             <ChatMessage user={message.user}>
               <Typography>{message.text}</Typography>
             </ChatMessage>
@@ -127,5 +130,6 @@ function Chat() {
 }
 
 export default Chat;
+
 
 
