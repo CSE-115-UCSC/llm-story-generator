@@ -66,8 +66,9 @@ function App() {
 function Chat() {
   const [message, setMessage] = useState("");
   const [prompt, setPrompt] = useState("")
+  const [summary, setSummary] = useState("")
 
-  const getData = () => {
+  const getLLMResponse = () => {
     setPrompt("")
     fetch('http://127.0.0.1:5000/chapter/1', {
       method: 'POST', // Specify the request method
@@ -95,21 +96,40 @@ function Chat() {
     })
     .catch((err) => console.error(err));
   }
+
+  const getSummaries = () => {
+    fetch('http://127.0.0.1:5000/summaries')
+    .then(response => {
+      // Checking if the request was successful
+      if (!response.ok) {
+        throw new Error('Network response was not ok ' + response.statusText);
+      }
+      return response.json(); // Parsing the JSON data from the response
+    })
+    .then(data => {
+      // Handling the data from the API
+      console.log('summaries: ', data);
+      setSummary(data["1"])
+    })
+  }
   
   return (
     <Box>
       <Typography variant="h6">Chat with AI</Typography>
       <ChatMessage>{message}</ChatMessage>
-      
+      <ChatMessage>{summary}</ChatMessage>
       <ChatInputContainer>
         <StyledInputBase
           value={prompt}
           onChange={(e) => setPrompt(e.target.value)}
-          onKeyPress={(e) => e.key === 'Enter' && getData()}
+          onKeyPress={(e) => e.key === 'Enter' && getLLMResponse()}
           placeholder="Type a message..."
         />
-        <Button variant="outlined" onClick={getData}>
+        <Button variant="outlined" onClick={getLLMResponse}>
         generate
+        </Button>
+        <Button variant="outlined" onClick={getSummaries}>
+        sum
         </Button>
       </ChatInputContainer>
     </Box>

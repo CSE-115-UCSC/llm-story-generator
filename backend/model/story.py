@@ -20,6 +20,12 @@ class Story:
     def chapter(self, number: int):
         return self.chapters[number]
     
+    def summaries(self):
+        sum_dict = {}
+        for chapter in self.chapters[1:]:
+            sum_dict[chapter.number] = chapter.summary
+        return sum_dict
+    
     # return a character object
     def character(self, number: int, name: str):
         return self.characters[number][name]
@@ -31,7 +37,7 @@ class Story:
 
     def set_chapter(self, number: int, text: str):
         # add a new chapter
-        ch = Chapter(number, text)
+        ch = Chapter(number=number, text=text)
         self.chapters.append(ch)
     
     def set_character(self, number: int, name: str, traits: List[str]):
