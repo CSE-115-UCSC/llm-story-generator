@@ -9,7 +9,7 @@
   },
 });*/
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Container, Box, Button, ButtonGroup, Typography } from '@mui/material';
 //import Paper from '@mui/material/Paper';
 //import InputBase from '@mui/material/InputBase';
@@ -65,12 +65,63 @@ function App() {
 
 // Chat component for the left sidebar
 function Chat() {
+  const [message, setMessage] = useState("");
+  
+  const getData = () => {
+    fetch('http://127.0.0.1:5000/chapter/1')
+    .then((response) => {
+      const reader = response.body.getReader();
+      // read() returns a promise that resolves when a value has been received
+      reader.read().then(function pump({ done, value }) {
+        if (done) {
+          // Do something with last chunk of data then exit reader
+          return;
+        }
+        // Otherwise do something here to process current chunk
+        const chunkString = new TextDecoder().decode(value);
+        // Log the chunk string
+        console.log(chunkString);
+        setMessage(message => [...message, chunkString])
+        // Read some more, and call this function again
+        return reader.read().then(pump);
+      });
+    })
+    .catch((err) => console.error(err));
+  }
+
+  // useEffect(() => {
+  //   console.log("creating event...")
+  //   const eventSource = new EventSource('http://127.0.0.1:5000/chapter/1', {
+  //     withCredentials: true,
+  //   });
+  //   console.log("Event created.")
+  //   eventSource.onmessage = (event) => {
+  //     console.log("Got message!")
+  //     setMessage(message+event.data);
+  //   };
+
+  //   eventSource.onerror = (error) => {
+  //     console.error('EventSource failed:', error);
+  //     eventSource.close();
+  //   };
+
+  //   // Clean up the EventSource when the component unmounts
+  //   return () => {
+  //     eventSource.close();
+  //   };
+  // }, []);
+  
   return (
     <Box>
       <Typography variant="h6">Chat with AI</Typography>
+      <p>{message}</p>
+      <Button variant="outlined" onClick={getData}>
+        generate
+      </Button>
     </Box>
   );
 }
+
 
 // Chapters component to display chapter buttons and content
 function Chapters() {
@@ -217,10 +268,3 @@ function Characters() {
 }
 
 export default App;
-
-
-
-
-
-
-
