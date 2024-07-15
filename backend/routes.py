@@ -1,11 +1,21 @@
-# Import Statements
+# The llm we're using 
 from openai import OpenAI
-from flask import Flask, request, jsonify, Response, stream_with_context
 
+# what manages our API resources and server
+from flask import Flask, request, jsonify, Response, stream_with_context
+from flask_cors import CORS, cross_origin
+import dotenv # for env vars
+
+# our model
 from model.story import Story
 
 app = Flask(__name__)
-llm = OpenAI(api_key="")
+
+# CORS config
+CORS(app)
+
+dotenv.load_dotenv()
+llm = OpenAI()
 
 # Initializing the StoryManager instance
 story_manager = Story()
@@ -27,7 +37,6 @@ def generate_chapter(chapter: int):
     #     yield escape(request.args['name'])
     #     yield '!</p>'
     # return stream_with_context(generate())
-
     def g(chapter):
         openai_stream = llm.chat.completions.create(
             model="gpt-3.5-turbo",
@@ -42,7 +51,8 @@ def generate_chapter(chapter: int):
                 yield chunk.choices[0].delta.content
         story_manager.set_chapter(chapter, text)
 
-    return stream_with_context(g(chapter))
+    return Response(stream_with_context(g(chapter)), content_type='text/event-stream')
+
     
 # Route to regenerate an existing chapter
 @app.route('/chapter/<int:chapter>', methods=['POST'])
@@ -56,9 +66,9 @@ def regenerate_chapter(chapter: int):
 #     return Response(stream_with_context(story_manager.regenerate_chapter(chapter_num, prompt)), content_type='text/plain')
 
 # # Route to fetch a specific chapter
-# @app.route('/chapter/{number}', methods=['GET'])
-# def get_chapters():
-#     return jsonify({"chapters": story_manager.chapter.get_all()})
+@app.route('/character', methods=['GET'])
+def get_chapters():
+    return "Hi"
 
 # # Route to fetch a specific summary
 # @app.route('/chapter/{number}/summary', methods=['GET'])
@@ -101,4 +111,4 @@ def regenerate_chapter(chapter: int):
 
 # Run the Flask application
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, threaded=True)
