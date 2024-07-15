@@ -66,7 +66,6 @@ function App() {
 function Chat() {
   const [message, setMessage] = useState("");
   const [prompt, setPrompt] = useState("")
-  const [summary, setSummary] = useState("")
 
   const getLLMResponse = () => {
     setPrompt("")
@@ -96,28 +95,11 @@ function Chat() {
     })
     .catch((err) => console.error(err));
   }
-
-  const getSummaries = () => {
-    fetch('http://127.0.0.1:5000/summaries')
-    .then(response => {
-      // Checking if the request was successful
-      if (!response.ok) {
-        throw new Error('Network response was not ok ' + response.statusText);
-      }
-      return response.json(); // Parsing the JSON data from the response
-    })
-    .then(data => {
-      // Handling the data from the API
-      console.log('summaries: ', data);
-      setSummary(data["1"])
-    })
-  }
   
   return (
     <Box>
       <Typography variant="h6">Chat with AI</Typography>
       <ChatMessage>{message}</ChatMessage>
-      <ChatMessage>{summary}</ChatMessage>
       <ChatInputContainer>
         <StyledInputBase
           value={prompt}
@@ -127,9 +109,6 @@ function Chat() {
         />
         <Button variant="outlined" onClick={getLLMResponse}>
         generate
-        </Button>
-        <Button variant="outlined" onClick={getSummaries}>
-        sum
         </Button>
       </ChatInputContainer>
     </Box>

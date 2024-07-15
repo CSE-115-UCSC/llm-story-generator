@@ -87,36 +87,41 @@ This article is motivated by Dr. Royce's analysis of the past three decades has 
 function Summaries() {
   // State to manage the currently selected summary
   const [selectedSummary, setSelectedSummary] = useState(null);
-
+  const [summaries, setSummaries] = useState({})
   // Array of summary objects with id, title, and content
-  const summaries = [
-	{ id: 1, title: 'Chapter 1: s', content: 'Summary of Chapter 1: meow' },
-	{ id: 2, title: 'Chapter 2: s', content: 'Summary of Chapter 2: meow meow' },
-	{ id: 3, title: 'Chapter 3: s', content: 'Summary of Chapter 3: meow meow meow' },
-  ];
+//   const summaries = [
+// 	{ id: 1, title: 'Chapter 1: s', content: 'Summary of Chapter 1: meow' },
+// 	{ id: 2, title: 'Chapter 2: s', content: 'Summary of Chapter 2: meow meow' },
+// 	{ id: 3, title: 'Chapter 3: s', content: 'Summary of Chapter 3: meow meow meow' },
+//   ];
+
+  const getSummaries = () => {
+    fetch('http://127.0.0.1:5000/summaries')
+    .then(response => {
+      // Checking if the request was successful
+      if (!response.ok) {
+        throw new Error('Network response was not ok ' + response.statusText);
+      }
+      return response.json(); // Parsing the JSON data from the response
+    })
+    .then(data => {
+      // Handling the data from the API
+      console.log('summaries: ', data);
+      setSummaries(data)
+    })
+  }
 
   return (
 	<Box>
   	{/* Map through summaries array and create buttons for each summary */}
-  	{summaries.map(summary => (
-    	<Box key={summary.id} mb={2}>
-      	<Button variant="outlined" onClick={() => setSelectedSummary(summary.id)}>
-        	{summary.title}
-      	</Button>
-      	{/* Display summary content if it is the currently selected summary */}
-      	{selectedSummary === summary.id && (
-        	<Box>
-          	{splitTextIntoParagraphsAndLines(summary.content, 10).map((paragraph, pIndex) => (
-            	<Box key={pIndex} mb={2}>
-              	{paragraph.map((line, lIndex) => (
-                	<Typography key={lIndex}>{line}</Typography>
-              	))}
-            	</Box>
-          	))}
-        	</Box>
-      	)}
-    	</Box>
-  	))}
+	  {Object.entries(summaries).map(([key, value]) => (
+          <p key={key}>
+            <strong>{key}:</strong> {JSON.stringify(value)}
+          </p>
+        ))}
+	  <Button variant="outlined" onClick={getSummaries}>
+        sum
+      </Button>
 	</Box>
   );
 }

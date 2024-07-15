@@ -79,6 +79,7 @@ def get_chapters():
 @app.route('/summaries', methods=['GET'])
 def get_summaries():
     summary_dict = story_manager.summaries()
+    app.logger.info(f"/summaries: {summary_dict}")
     return jsonify(summary_dict)
 
 # # Route to fetch a specific character
