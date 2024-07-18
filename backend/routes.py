@@ -22,22 +22,28 @@ story_manager = Story()
 
 # Route to generate a new chapter
 @app.route('/chapter/<int:chapter_num>', methods=["GET", "POST"])
-def generate_chapter(chapter_num: int):
+def chapter(chapter_num: int):
+    # body contains a prompt, the prompt creates a chapter
     if request.method == "POST":
+        # follows the OpenAI streaming tutorial.
         def g(chapter_num: int):
-            data = request.json
-            query = data.get('query')
+            data = request.json # from the POST request
+            query = data.get('query') # from the POST request
+            # API call
             openai_stream = llm.chat.completions.create(
                 model="gpt-3.5-turbo",
                 messages=[{"role": "user", "content": query}],
                 temperature=0.1,
                 stream=True,
             )
+            # streaming
             text = ""
             for chunk in openai_stream:
                 if chunk.choices[0].delta.content is not None:
                     text += chunk.choices[0].delta.content
                     yield chunk.choices[0].delta.content
+
+            # model update
             story_manager.set_chapter(number=chapter_num, text=text)
             app.logger.info(f"Story().chapter:\n number: {story_manager.chapter(chapter_num).number}\n text: {story_manager.chapter(chapter_num).text}")
             story_manager.set_prompt(chapter_num, query)
@@ -55,8 +61,11 @@ def generate_chapter(chapter_num: int):
                 stop=None,
                 temperature=0.7
             ).choices[0].message.content
+            
+            # model update
             story_manager.chapter(chapter_num).summary = chapter_summarized
             app.logger.info(f"Story().summary:\n number: {story_manager.chapter(chapter_num).number}\n text: {story_manager.chapter(chapter_num).summary}")
+        
         return Response(stream_with_context(g(chapter_num)), content_type='text/event-stream')
         
 # Route to regenerate an existing chapter
@@ -71,9 +80,19 @@ def generate_chapter(chapter_num: int):
 #     return Response(stream_with_context(story_manager.regenerate_chapter(chapter_num, prompt)), content_type='text/plain')
 
 # # Route to fetch a specific chapter
-@app.route('/character', methods=['GET'])
-def get_chapters():
-    return "Hi"
+@app.route('/character', methods=['GET', 'POST'])
+def character():
+    if request.method == 'GET':
+        # mess with the story object (our model)
+        # get or set the character via story_manager
+        return "You got"
+    elif request.method == 'POST':
+        # gets the body of a POST request
+        data = request.json
+        query = data.get('query')
+        return "You posted up"
+    else:
+        return Response(status = 404)
 
 # Route to fetch a specific summary
 @app.route('/summaries', methods=['GET'])
