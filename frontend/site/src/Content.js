@@ -6,7 +6,8 @@ import Characters from './Character';
 
 function Content() {
   const [view, setView] = useState('chapters');
-
+ 
+  
   return (
     <Box p={2}>
       <ButtonGroup variant="contained">
