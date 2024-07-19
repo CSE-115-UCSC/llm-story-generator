@@ -1,4 +1,3 @@
-// src/Chat.js
 import React, { useState, useEffect, useRef } from 'react';
 import { Box, InputBase, IconButton, Typography, Paper, styled, useTheme } from '@mui/material';
 import SendIcon from '@mui/icons-material/Send';
@@ -6,8 +5,8 @@ import SmartToyIcon from '@mui/icons-material/SmartToy';
 import PersonIcon from '@mui/icons-material/Person';
 
 const ChatContainer = styled(Paper)(({ theme }) => ({
-  width: '100%', // 占用整个父容器的宽度
-  height: '100%', // 占用整个父容器的高度
+  width: '100%',
+  height: '100%',
   backgroundColor: theme.palette.background.default,
   display: 'flex',
   flexDirection: 'column',
@@ -30,7 +29,7 @@ const ChatMessageContainer = styled(Box)({
 const ChatMessage = styled(Box)(({ user, theme }) => ({
   display: 'flex',
   alignItems: 'center',
-  marginLeft: '8px',
+  marginLeft: '15px',
   padding: '10px',
   borderRadius: '5px',
   backgroundColor: user ? theme.palette.custom.messageBubble.user.background : theme.palette.custom.messageBubble.bot.background,
@@ -55,44 +54,89 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
   color: theme.palette.custom.inputField.text,
 }));
 
-function Chat() {
-  const theme = useTheme(); // 使用 useTheme 钩子获取主题
+const StyledPersonIcon = styled(PersonIcon)(({ theme }) => ({
+  fontSize: '50px', // Adjust size of the user icon
+  color: theme.palette.custom.icons.user,
+  alignSelf: 'flex-start', // Adjust vertical position
+}));
 
+const StyledSmartToyIcon = styled(SmartToyIcon)(({ theme }) => ({
+  fontSize: '50px', // Adjust size of the bot icon
+  color: theme.palette.custom.icons.bot,
+  alignSelf: 'flex-start', // Adjust vertical position
+}));
+
+function Chat() {
+  const theme = useTheme();
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
   const messagesEndRef = useRef(null);
 
-  const handleSend = () => {
-    if (input.trim()) {
-      setMessages([...messages, { text: input, user: true }]);
-      setInput('');
-      simulateBotResponse('I am a robot. I do not know your word.');
-    }
-  };
+  const getLLMResponse = () => {
+    const prompt = input.trim();
+    if (!prompt) return;
+    
+    setMessages([...messages, { text: prompt, user: true }]);
+    setInput('');
+    setMessages((prevMessages) => [
+      ...prevMessages,
+      { text: '', user: false, typing: true },
+    ]);
 
-  const simulateBotResponse = (text) => {
-    setTimeout(() => {
-      setMessages((prevMessages) => [
-        ...prevMessages,
-        { text: '', user: false, typing: true },
-      ]);
-      let index = -1;
-      const interval = setInterval(() => {
-        if (index < text.length - 1) {
+    fetch('http://127.0.0.1:5000/chapter/1', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ "query": prompt })
+    })
+    .then((response) => {
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder('utf-8'); // Ensure UTF-8 decoding
+      let partialResult = '';
+  
+      reader.read().then(function pump({ done, value }) {
+        if (done) {
+          // Finalize message if done
           setMessages((prevMessages) => {
             const newMessages = [...prevMessages];
             newMessages[newMessages.length - 1] = {
               ...newMessages[newMessages.length - 1],
-              text: newMessages[newMessages.length - 1].text + text[index],
+              text: partialResult,
+              typing: false,
             };
             return newMessages;
           });
-          index++;
-        } else {
-          clearInterval(interval);
+          return;
         }
-      }, 25); // Speed up the typing effect
-    }, 500);
+  
+        const chunkString = decoder.decode(value, { stream: true });
+        partialResult += chunkString;
+        simulateBotResponse(chunkString);
+        return reader.read().then(pump);
+  
+  
+      });
+    })
+    .catch((err) => console.error(err));
+  };
+
+  const simulateBotResponse = (text) => {
+    let index = -1;
+    const interval = setInterval(() => {
+      if (index < text.length - 1) {
+        setMessages((prevMessages) => {
+          const newMessages = [...prevMessages];
+          newMessages[newMessages.length - 1] = {
+            ...newMessages[newMessages.length - 1],
+            text: newMessages[newMessages.length - 1].text + text[++index],
+          };
+          return newMessages;
+        });
+      } else {
+        clearInterval(interval);
+      }
+    }, 25);
   };
 
   useEffect(() => {
@@ -106,7 +150,10 @@ function Chat() {
       <ChatMessages>
         {messages.map((message, index) => (
           <ChatMessageContainer key={index}>
-            {message.user ? <PersonIcon style={{ color: theme.palette.custom.icons.user }} /> : <SmartToyIcon style={{ color: theme.palette.custom.icons.bot }} />}
+            {message.user ? 
+              <StyledPersonIcon /> :
+              <StyledSmartToyIcon />
+            }
             <ChatMessage user={message.user}>
               <Typography>{message.text}</Typography>
             </ChatMessage>
@@ -118,15 +165,17 @@ function Chat() {
         <StyledInputBase
           value={input}
           onChange={(e) => setInput(e.target.value)}
-          onKeyPress={(e) => e.key === 'Enter' && handleSend()}
+          onKeyPress={(e) => e.key === 'Enter' && getLLMResponse()}
           placeholder="Type a message..."
         />
-        <IconButton color="primary" onClick={handleSend}>
+        <IconButton color="primary" onClick={getLLMResponse}>
           <SendIcon />
         </IconButton>
       </ChatInputContainer>
     </ChatContainer>
   );
 }
+
+
 
 export default Chat;
