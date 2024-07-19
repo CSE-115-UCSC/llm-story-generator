@@ -2,7 +2,7 @@ import { ThemeProvider } from '@mui/material/styles';
 import React, { useState } from 'react';
 import { Container, Box, Button, InputBase, Typography, CssBaseline, Paper, styled, Tab, Tabs } from '@mui/material';
 import Content from './Content';
-//import Chat from './Chat';
+import Chat from './Chat';
 import theme from './theme';
 
 const ChaptersContainer = styled(Paper)({
@@ -49,19 +49,19 @@ function App() {
 	<ThemeProvider theme={theme}>
     <CssBaseline />
     <Container disableGutters maxWidth={false} sx={{ height: '100vh', display: 'flex' }}>
-      <Box width="50%" height="100%">
+      <Box width="40%" height="100%">
         <ChaptersContainer>
           <Content />
         </ChaptersContainer>
       </Box>
-      <Box width="50%" height="100%">
+      <Box width="60%" height="100%">
         <Chat />
       </Box>
     </Container>
 	</ThemeProvider>
   );
 }
-
+/*
 // Chat component for the left sidebar
 function Chat() {
   const [message, setMessage] = useState("");
@@ -114,5 +114,5 @@ function Chat() {
     </Box>
   );
 }
-
+*/
 export default App;
