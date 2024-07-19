@@ -19,10 +19,32 @@ llm = OpenAI()
 # Initializing the StoryManager instance
 story_manager = Story()
 
+story_manager.set_chapter(1,"jrgihewrjngejkrngoqb;oer")
+story_manager.chapters[1].summary = "shuhwgro"
+
+story_manager.set_chapter(2,"jrgihewrjngejkrngoqb;oer")
+story_manager.chapters[2].summary = "shuhwgro"
+
+story_manager.set_chapter(3,"jrgihewrjngejkrngoqb;oer")
+story_manager.chapters[3].summary = "shuhwgro"
+
+story_manager.set_chapter(4,"jrgihewrjngejkrngoqb;oer")
+story_manager.chapters[4].summary = "shuhwgro"
+
+story_manager.set_chapter(5,"jrgihewrjngejkrngoqb;oer")
+story_manager.chapters[5].summary = "shuhwgro"
+
+story_manager.set_chapter(6,"jrgihewrjngejkrngoqb;oer")
+story_manager.chapters[6].summary = "shuhwgro"
+
+story_manager.set_chapter(7,"jrgihewrjngejkrngoqb;oer")
+story_manager.chapters[7].summary = "shuhwgro"
+
 
 # Route to generate a new chapter
 @app.route('/chapter/<int:chapter_num>', methods=["GET", "POST"])
 def generate_chapter(chapter_num: int):
+    #generate the chapter 
     if request.method == "POST":
         def g(chapter_num: int):
             data = request.json
@@ -39,7 +61,7 @@ def generate_chapter(chapter_num: int):
                     text += chunk.choices[0].delta.content
                     yield chunk.choices[0].delta.content
             story_manager.set_chapter(number=chapter_num, text=text)
-            app.logger.info(f"Story().chapter:\n number: {story_manager.chapter(chapter_num).number}\n text: {story_manager.chapter(chapter_num).text}")
+            app.logger.info(f"Story().chapter:\n number: {story_manager.get_chapter(chapter_num).number}\n text: {story_manager.get_chapter(chapter_num).text}")
             story_manager.set_prompt(chapter_num, query)
             
             # produce the summary
@@ -56,9 +78,34 @@ def generate_chapter(chapter_num: int):
                 temperature=0.7
             ).choices[0].message.content
             story_manager.chapter(chapter_num).summary = chapter_summarized
-            app.logger.info(f"Story().summary:\n number: {story_manager.chapter(chapter_num).number}\n text: {story_manager.chapter(chapter_num).summary}")
+            app.logger.info(f"Story().summary:\n number: {story_manager.get_chapter(chapter_num).number}\n text: {story_manager.get_chapter(chapter_num).summary}")
+
         return Response(stream_with_context(g(chapter_num)), content_type='text/event-stream')
+    
+
+    #get the chapter
+    if request.method == "GET":
+        # check if chapter exists 
+
+        chapter_text= story_manager.get_chapter(1).text
+        #
+        app.logger.info(f"/chapter: {chapter_text}")
+        return jsonify(chapter_text)
         
+        # if(story_manager.number_chapters <= chapter_num):
+        #     #print("here")
+        #     return Response(status = 404)
+
+        # #gets a chapter 
+        # chapter_text= story_manager.chapter(chapter_num).text
+        # #
+        # app.logger.info(f"/chapter: {chapter_text}")
+        # return jsonify(chapter_text)
+        
+
+
+
+
 # Route to regenerate an existing chapter
 # @app.route('/chapter/<int:chapter>', methods=['POST'])
 # def regenerate_chapter(chapter: int):
@@ -72,13 +119,13 @@ def generate_chapter(chapter_num: int):
 
 # # Route to fetch a specific chapter
 @app.route('/character', methods=['GET'])
-def get_chapters():
+def character():
     return "Hi"
 
 # Route to fetch a specific summary
 @app.route('/summaries', methods=['GET'])
-def get_summaries():
-    summary_dict = story_manager.summaries()
+def summaries():
+    summary_dict = story_manager.get_summaries()
     app.logger.info(f"/summaries: {summary_dict}")
     return jsonify(summary_dict)
 
@@ -96,9 +143,9 @@ def get_summaries():
 # #these might be outdated since they do all 
 
 # # Route to fetch all chapters
-# @app.route('/chapters', methods=['GET'])
-# def get_chapters():
-#     return jsonify({"chapters": story_manager.chapter.get_all()})
+@app.route('/chapters', methods=['GET'])
+def chapters():
+    return jsonify(story_manager.get_chapters())
 
 # # Route to fetch all summaries
 # @app.route('/summaries', methods=['GET'])
