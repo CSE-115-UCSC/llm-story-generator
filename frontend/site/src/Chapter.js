@@ -7,16 +7,6 @@ function Chapters() {
   //const [expandedChapters, setExpandedChapters] = useState({});
   const [chapters, setChapters] = useState([]);
 
-  //total chapters 
-  //var TotalChapter = -1;
-  //list of chapters 
-  // var chapters = [ 
-  //   { id: 1, title: 'Chapter 1: RAC1', content: `The paper by Winston Royce was published in August 1970. This paper was published from Proceedings, IEEE WESCON. This article is motivated by Dr. Royce's analysis of the past three decades has been based on the development of software packages for spacecraft mission planning, command and post-flight, so he has a unique perspective on managing large software development projects.` },
-  //   { id: 2, title: 'Chapter 2: Rac11', content: `I think there are six reasons to do extensive documentation in software development. First, documents can visualize the technology, allowing designers, management and customers to communicate clearly and effectively, which reduces a lot of misunderstandings. Secondly, there needs to be a collective design at the beginning of software development, so that there can be a formal discussion. Let the team have a clear picture to work on. Thirdly, valid documentation allows testers to identify and fix bugs in programs more quickly. Then, there can't be just one person who knows what's going on with the program.` },
-  //   { id: 3, title: 'Chapter 3: test the content', content: `Content of Chapter 3: lalalala 12345678 lalal baba haha xixi cici` },
-  // ];
-  //call to api to get chapters
-
   console.log("TEST");
   UpdateChapterList(1);
 
