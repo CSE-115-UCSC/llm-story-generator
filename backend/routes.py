@@ -18,9 +18,9 @@ llm = OpenAI()
 
 # Initializing the StoryManager instance
 story_manager = Story()
-
-story_manager.set_chapter(1,"jrgihewrjngejkrngoqb;oer")
-story_manager.chapters[1].summary = "shuhwgro"
+#Write a story about courageous bob, silly billy martin, and weird chloe in 100 words.
+story_manager.set_chapter(1,"""Courageous Bob, Silly Billy Martin, and Weird Chloe embarked on a peculiar adventure. In the enchanted forest, Bob fearlessly led the way, his sword glinting in the moonlight. Billy tripped over roots, making Chloe giggle with her odd, snorting laugh. They stumbled upon a mysterious cave. Inside, a dragon slept on a pile of gold. Bob stepped forward, heart pounding. "We need that gold", he whispered. Billy slipped on a banana peel, waking the dragon. Chloe, with her quirky charm, sang a strange melody, calming the beast. The dragon, enchanted, let them take the gold. Together, they triumphed, united by their quirks.""")
+story_manager.chapters[1].summary = """Courageous Bob, Silly Billy Martin, and Weird Chloe embarked on an adventure in an enchanted forest. Bob led the way, Billy's clumsiness made Chloe laugh, and they found a dragon guarding gold in a cave. After Billy accidentally woke the dragon, Chloe's quirky song calmed it, allowing them to take the gold. United by their quirks, they triumphed together."""
 
 story_manager.set_chapter(2,"jrgihewrjngejkrngoqb;oer")
 story_manager.chapters[2].summary = "shuhwgro"
@@ -82,11 +82,19 @@ def chapter(chapter_num: int):
                 stop=None,
                 temperature=0.7
             ).choices[0].message.content
-            
+
             # model update
-            story_manager.chapter(chapter_num).summary = chapter_summarized
+            story_manager.chapters[chapter_num].summary = chapter_summarized
 
             app.logger.info(f"Story().summary:\n number: {story_manager.get_chapter(chapter_num).number}\n text: {story_manager.get_chapter(chapter_num).summary}")
+
+            #produce the characters and traits
+            characters = extract_characters( story_manager.chapters[1].text)
+            #
+            for name,traits in characters.items():  
+                story_manager.set_character(name, chapter_num, traits)
+
+            app.logger.info(story_manager.characters)
 
         return Response(stream_with_context(g(chapter_num)), content_type='text/event-stream')
     
@@ -127,17 +135,12 @@ def chapter(chapter_num: int):
 
 # # Route to fetch a specific chapter
 
-@app.route('/character', methods=['GET', 'POST'])
-def character():
+@app.route('/characters', methods=['GET'])
+def characters():
     if request.method == 'GET':
         # mess with the story object (our model)
         # get or set the character via story_manager
-        return "You got"
-    elif request.method == 'POST':
-        # gets the body of a POST request
-        data = request.json
-        query = data.get('query')
-        return "You posted up"
+        return jsonify(story_manager.get_characters())
     else:
         return Response(status = 404)
 
@@ -181,6 +184,37 @@ def chapters():
 # def clear_data():
 #     story_manager.__init__()
 #     return jsonify({"status": "Cleared all stored data"})
+
+
+def extract_characters(chapter_text: str):
+        prompt = f"Extract the main characteristics of all the main characters from the following text:\n{chapter_text}. Each character should have only a maximum of five main characteristics. The characteristics should be written in this form - Character Name: Qualities."
+        response = llm.chat.completions.create(
+            model="gpt-3.5-turbo",
+            messages=[
+                {"role": "system", "content": "You are a helpful assistant."},
+                {"role": "user", "content": prompt}
+            ],
+            max_tokens=300,
+            n=1,
+            stop=None,
+            temperature=0.7
+        ).choices[0].message 
+        # spring of form character: trait, trait... .\n
+        character_body = response.content
+        character_lines = character_body.split('\n')
+        # {character_name:[traits]}
+        characters = {}
+
+        for character_line in character_lines:
+            # if the response is not in correct form
+            if ':' in character_line:
+                name, traits = character_line.split(':', 1)
+                characters[name] = traits.split(', ')
+
+        return characters
+
+
+
 
 # Run the Flask application
 if __name__ == '__main__':

@@ -76,7 +76,7 @@ function Character(props) {
   }
 
   useEffect(() => {
-    fetch('http://127.0.0.1/character')
+    fetch('http://127.0.0.1/characters',{ method: 'GET'})
       .then(response => {
         if (!response.ok) {
           throw new Error('Network response was not ok');
