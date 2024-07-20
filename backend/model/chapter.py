@@ -10,6 +10,7 @@ class Chapter:
 
     def character(self, name: str):
         return self.characters[name]
+    
 
     # # To generate a chapter using OpenAI API
     # def generate(self, prompt, max_tokens=4096):
