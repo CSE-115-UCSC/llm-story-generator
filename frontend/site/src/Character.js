@@ -42,18 +42,12 @@ const updateCharacter = async (character, traits) => {
   }
 };
 
-// Can you see making a comment. YES
-// cd frontend/site && npm start
 function Characters() {
   const [selectedCharacter, setSelectedCharacter] = useState(null);
   const [newTrait, setNewTrait] = useState("");
   const [characters, setCharacters] = useState({}); // hold a list of characters (append characters to it), 'character name': ['trait1', 'trait2', ...] 
   const [editableTraits, setEditableTraits] = useState({});
-  // const characters = [
-  //   { id: 1, name: 'Character 1', details: 'Details of Character 1: meow' },
-  //   { id: 2, name: 'Character 2', details: 'Details of Character 2: meow meow' },
-  //   { id: 3, name: 'Character 3', details: 'Details of Character 3: meow meow meow' },
-  // ];
+  
   useEffect(() => {
     fetchCharacters();
   }, []);
@@ -162,6 +156,10 @@ function Characters() {
           </Button>
         </Box>
       )}
+//       {characters.map(name => (
+//         <Character name={name}/>
+//       ))}
+
     </Box>
   );
 }
@@ -199,15 +197,16 @@ export default Characters;
 // ))}
 
 
-// might need to split character up a lil bit
-//function Character(props) {
-  
-// const callAPI = () => {
-//    console.log("Hi I'm a button.")
-  //}
+
+
+function Character(props) {
+  const [chapters, setChapter] = useState([]);
+  const callAPI = () => {
+    console.log("Hi I'm a button.")
+  }
 
   useEffect(() => {
-    fetch('http://127.0.0.1/characters',{ method: 'GET'})
+    fetch(`http://127.0.0.1/characters/${props.name}`,{ method: 'GET'})
       .then(response => {
         if (!response.ok) {
           throw new Error('Network response was not ok');
@@ -216,12 +215,13 @@ export default Characters;
       })
       .then(data => {
         console.log(data)
+        setChapter(data)
       })
       .catch(error => {
         console.log(error)
       });
   }, []);
-
+  
   //return (
    // <Box>
      // <Button onClick={callAPI}>Hello</Button>
@@ -232,4 +232,18 @@ export default Characters;
     //</Box>
   //);
 //}
+  
+  return (
+    <Box>
+      {Object.entries(chapters).map((number, value) => (
+        <Chapter number={number}/>
+      ))}
+    </Box>
+  );
+}
 
+function Chapter(props){
+  return <p>{props.name}</p>
+}
+
+export default Characters;
