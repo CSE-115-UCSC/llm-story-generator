@@ -32,8 +32,8 @@ const ChatMessage = styled(Box)(({ user, theme }) => ({
   marginLeft: '15px',
   padding: '10px',
   borderRadius: '5px',
-  backgroundColor: user ? theme.palette.custom.messageBubble.user.background : theme.palette.custom.messageBubble.bot.background,
-  color: user ? theme.palette.custom.messageBubble.user.text : theme.palette.custom.messageBubble.bot.text,
+  backgroundColor: user == 'true' ? theme.palette.custom.messageBubble.user.background : theme.palette.custom.messageBubble.bot.background,
+  color: user == 'true' ? theme.palette.custom.messageBubble.user.text : theme.palette.custom.messageBubble.bot.text,
   maxWidth: '80%',
 }));
 
@@ -70,20 +70,27 @@ function Chat() {
   const theme = useTheme();
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
+  const [chapterNumber, setChapterNumber] = useState(0);
   const messagesEndRef = useRef(null);
+
+  const incrementChapter = (chapterNumber) =>{
+    setChapterNumber(chapterNumber => chapterNumber + 1)
+  }
 
   const getLLMResponse = () => {
     const prompt = input.trim();
     if (!prompt) return;
-    
-    setMessages([...messages, { text: prompt, user: true }]);
+
+    incrementChapter(chapterNumber);
+
+    setMessages([...messages, { text: prompt, user: 'true' }]);
     setInput('');
     setMessages((prevMessages) => [
       ...prevMessages,
-      { text: '', user: false, typing: true },
+      { text: '', user: 'false', typing: true },
     ]);
 
-    fetch('http://127.0.0.1:5000/chapter/1', {
+    fetch(`http://127.0.0.1:5000/chapter/${chapterNumber}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -112,7 +119,7 @@ function Chat() {
   
         const chunkString = decoder.decode(value, { stream: true });
         partialResult += chunkString;
-        simulateBotResponse(chunkString);
+        //simulateBotResponse(chunkString);
         return reader.read().then(pump);
   
   
@@ -150,7 +157,7 @@ function Chat() {
       <ChatMessages>
         {messages.map((message, index) => (
           <ChatMessageContainer key={index}>
-            {message.user ? 
+            {message.user == 'true' ? 
               <StyledPersonIcon /> :
               <StyledSmartToyIcon />
             }
