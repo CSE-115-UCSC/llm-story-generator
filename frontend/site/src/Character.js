@@ -113,4 +113,8 @@ function Character(props) {
   );
 }
 
+function Chapter(props){
+  return <p>{props.name}</p>
+}
+
 export default Characters;

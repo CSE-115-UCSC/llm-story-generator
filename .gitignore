@@ -4,5 +4,8 @@ backend/__pycache__/
 .DS_Store
 .env
 env/*
+<<<<<<< Updated upstream
 backend/model/__pycache__/*
 backend/tests/__pycache__/*
+=======
+>>>>>>> Stashed changes
