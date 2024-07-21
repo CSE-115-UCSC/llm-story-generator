@@ -133,14 +133,38 @@ def chapter(chapter_num: int):
 
 #     return Response(stream_with_context(story_manager.regenerate_chapter(chapter_num, prompt)), content_type='text/plain')
 
-# # Route to fetch a specific chapter
+# # Route to fetch a specific chapter  
 
-@app.route('/characters', methods=['GET'])
+@app.route('/characters', methods=['GET', 'PUT'])
 def characters():
     if request.method == 'GET':
         # mess with the story object (our model)
         # get or set the character via story_manager
         return jsonify(story_manager.get_characters())
+    elif request.method == 'PUT':
+        app.logger.info(f"PUT /characters {request.data}")
+    else:
+        return Response(status = 404)
+
+@app.route('/characters/<string:character>', methods=['GET'])
+def character(character: str):
+    if request.method == 'GET':
+        # mess with the story object (our model)
+        # get or set the character via story_manager
+        return jsonify(story_manager.get_characters()[character])
+    elif request.method == 'PUT':
+        app.logger.info(f"PUT /characters {request.data}")
+    else:
+        return Response(status = 404)
+
+@app.route('/characters/<string:character>/<int:chapter>', methods=['GET'])
+def character_chapter_traits(character: str, chapter: int):
+    if request.method == 'GET':
+        # mess with the story object (our model)
+        # get or set the character via story_manager
+        return jsonify(story_manager.get_characters()[character][chapter])
+    elif request.method == 'PUT':
+        app.logger.info(f"PUT /characters {request.data}")
     else:
         return Response(status = 404)
 
