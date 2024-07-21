@@ -8,15 +8,25 @@ import { splitTextIntoParagraphsAndLines } from './utils';
 // cd frontend/site && npm start
 function Characters() {
   const [selectedCharacter, setSelectedCharacter] = useState(null);
-
   const [characters, setCharacters] = useState([]); // hold a list of characters (append characters to it), 'character name': ['trait1', 'trait2', ...] 
   
-  // const characters = [
-  //   { id: 1, name: 'Character 1', details: 'Details of Character 1: meow' },
-  //   { id: 2, name: 'Character 2', details: 'Details of Character 2: meow meow' },
-  //   { id: 3, name: 'Character 3', details: 'Details of Character 3: meow meow meow' },
-  // ];
-
+  useEffect(() => {
+    fetch('http://127.0.0.1/characters',{ method: 'GET'})
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        return response.json();
+      })
+      .then(data => {
+        console.log(data)
+        setCharacters(data)
+      })
+      .catch(error => {
+        console.log(error)
+      });
+  }, []);
+  
   const handleCorrect = (id) => {
     console.log(`Character ${id} marked as correct`);
     // Send message to AI
@@ -31,7 +41,9 @@ function Characters() {
 
   return (
     <Box>
-      <Character name="Bob" traits={["white af", "smart", "goofy"]}/>
+      {characters.map(name => (
+        <Character name={name}/>
+      ))}
     </Box>
   );
 }
@@ -70,13 +82,13 @@ function Characters() {
 
 // might need to split character up a lil bit
 function Character(props) {
-  
+  const [chapters, setChapter] = useState([]);
   const callAPI = () => {
     console.log("Hi I'm a button.")
   }
 
   useEffect(() => {
-    fetch('http://127.0.0.1/characters',{ method: 'GET'})
+    fetch(`http://127.0.0.1/characters/${props.name}`,{ method: 'GET'})
       .then(response => {
         if (!response.ok) {
           throw new Error('Network response was not ok');
@@ -85,6 +97,7 @@ function Character(props) {
       })
       .then(data => {
         console.log(data)
+        setChapter(data)
       })
       .catch(error => {
         console.log(error)
@@ -93,10 +106,8 @@ function Character(props) {
 
   return (
     <Box>
-      <Button onClick={callAPI}>Hello</Button>
-      <p>props.name</p>
-      {props.traits.map(item => (
-        <p>{item}</p>
+      {Object.entries(chapters).map((number, value) => (
+        <Chapter number={number}/>
       ))}
     </Box>
   );
