@@ -9,27 +9,40 @@ class Story:
         self.name = name
         self.chapters = [None]
         self.prompts = [None]
-        self.characters = [None]
-        self.number_chapters = len(self.chapters) - 1
+        self.characters = {}
+        self.number_chapters = len(self.chapters)
 
     # return a prompt object
-    def prompt(self, number: int):
+    def get_prompt(self, number: int):
         return self.prompts[number]
 
     # return a chapter object
-    def chapter(self, number: int):
+    def get_chapter(self, number: int):
         return self.chapters[number]
     
-    def summaries(self):
+    #return all chapters
+    def get_chapters(self):
+        return [chapter.text for chapter in self.chapters[1:]]
+
+    def get_summaries(self):
         sum_dict = {}
         for chapter in self.chapters[1:]:
             sum_dict[chapter.number] = chapter.summary
         return sum_dict
     
     # return a character object
-    def character(self, number: int, name: str):
-        return self.characters[number][name]
-    
+    def get_character(self, name: str):
+        return self.characters[name]
+
+    def get_characters(self):
+        character_dict = {}
+
+        for name,character in self.characters.items():
+            character_dict[name] = character.get_traits()
+
+        return character_dict
+
+
     def set_prompt(self, number: int, message: str):
         # add a new prompt
         p = Prompt(number, message)
@@ -40,10 +53,18 @@ class Story:
         ch = Chapter(number=number, text=text)
         self.chapters.append(ch)
     
-    def set_character(self, number: int, name: str, traits: List[str]):
-        # add a new character to the chapter number
-        char = Character(name, traits)
-        self.characters[number][name] = char
+    def set_character(self, name: str, chapter_number: int, traits: List[str]):
+        #check if character exists 
+        if name in self.characters:
+            character_update = self.characters[name] 
+        else:
+            character_update = Character(name)
+
+        character_update.set_traits(chapter_number, traits)
+
+        self.characters[name]=character_update
+
+
 
     # # To generate a chapter with streaming response
     # def generate_chapter_streaming(self, prompt, clear_previous=False, max_tokens=4096):

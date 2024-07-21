@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-//import { Box, Button, Typography, IconButton, Grid } from '@mui/material';
 import { Box, Typography, IconButton, TextField, Button  } from '@mui/material';
 import CheckIcon from '@mui/icons-material/Check';
 import CloseIcon from '@mui/icons-material/Close';
@@ -207,21 +206,21 @@ export default Characters;
 //    console.log("Hi I'm a button.")
   //}
 
-//  useEffect(() => {
- //   fetch('http://127.0.0.1/character')
-//      .then(response => {
-//        if (!response.ok) {
-//          throw new Error('Network response was not ok');
-//        }
-//        return response.json();
-//      })
-//      .then(data => {
-//        console.log(data)
-//      })
-//      .catch(error => {
-//        console.log(error)
-//      });
-//  }, []);
+  useEffect(() => {
+    fetch('http://127.0.0.1/characters',{ method: 'GET'})
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        return response.json();
+      })
+      .then(data => {
+        console.log(data)
+      })
+      .catch(error => {
+        console.log(error)
+      });
+  }, []);
 
   //return (
    // <Box>

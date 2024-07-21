@@ -2,16 +2,23 @@ from typing import List
 
 # Class to handle character extraction and storage
 class Character:
-    def __init__(self, name: str, traits: List[str] ):
+    def __init__(self, name: str):
         # Initializing an empty dictionary to store character traits
-        self.traits = traits
+        self.chapters = {}
         self.name = name
 
-    def traits(self):
-        return self.traits
+    def set_traits(self, chapter_number: int, traits: List[str]):
+        self.chapters[chapter_number] = traits
+
+    def get_traits(self):
+        return self.chapters
     
+    def get_trait(self,chapter_number):
+        return self.chapters[chapter_number]
+
     def name(self):
         return self.name
+    
 
     # # To extract character traits from a chapter
     # def extract(self, chapter):
