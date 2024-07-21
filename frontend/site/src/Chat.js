@@ -104,22 +104,23 @@ function Chat() {
   
       reader.read().then(function pump({ done, value }) {
         if (done) {
-          // Finalize message if done
-          setMessages((prevMessages) => {
-            const newMessages = [...prevMessages];
-            newMessages[newMessages.length - 1] = {
-              ...newMessages[newMessages.length - 1],
-              text: partialResult,
-              typing: false,
-            };
-            return newMessages;
-          });
+          
           return;
         }
   
         const chunkString = decoder.decode(value, { stream: true });
         partialResult += chunkString;
         //simulateBotResponse(chunkString);
+        // Finalize message if done
+        setMessages((prevMessages) => {
+          const newMessages = [...prevMessages];
+          newMessages[newMessages.length - 1] = {
+            ...newMessages[newMessages.length - 1],
+            text: partialResult,
+            typing: false,
+          };
+          return newMessages;
+        });
         return reader.read().then(pump);
   
   
@@ -136,7 +137,7 @@ function Chat() {
           const newMessages = [...prevMessages];
           newMessages[newMessages.length - 1] = {
             ...newMessages[newMessages.length - 1],
-            text: newMessages[newMessages.length - 1].text + text[++index],
+            text: newMessages[newMessages.length - 1].text + text,
           };
           return newMessages;
         });
