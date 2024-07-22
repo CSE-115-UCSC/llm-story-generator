@@ -70,10 +70,10 @@ function Chat() {
   const theme = useTheme();
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
-  const [chapterNumber, setChapterNumber] = useState(0);
+  const [chapterNumber, setChapterNumber] = useState(1);
   const messagesEndRef = useRef(null);
 
-  const incrementChapter = (chapterNumber) =>{
+  const incrementChapter = () =>{
     setChapterNumber(chapterNumber => chapterNumber + 1)
   }
 
@@ -81,7 +81,7 @@ function Chat() {
     const prompt = input.trim();
     if (!prompt) return;
 
-    incrementChapter(chapterNumber);
+    incrementChapter();
 
     setMessages([...messages, { text: prompt, user: 'true' }]);
     setInput('');
