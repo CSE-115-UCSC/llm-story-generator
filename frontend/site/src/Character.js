@@ -2,31 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { Box, Typography, IconButton, TextField, Button  } from '@mui/material';
 import CheckIcon from '@mui/icons-material/Check';
 import CloseIcon from '@mui/icons-material/Close';
-//import { splitTextIntoParagraphsAndLines } from './utils';
-
-// Function to fetch characters from the backend
-const getCharacters = async () => {
-  try {
-    const response = await fetch('http://127.0.0.1:5000/character', {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json'
-      }
-    });
-    if (!response.ok) {
-      throw new Error('Network response was not ok');
-    }
-    return await response.json();
-  } catch (error) {
-    console.error('Error fetching characters:', error);
-    return { characteristics: {} };
-  }
-};
 
 // Function to update character traits in the backend
-const updateCharacter = async (character, traits) => {
+const updateCharacter = (character, traits) => {
   try {
-    const response = await fetch('http://127.0.0.1:5000/character', {
+    const response = fetch('http://127.0.0.1:5000/characters', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -36,7 +16,7 @@ const updateCharacter = async (character, traits) => {
     if (!response.ok) {
       throw new Error('Network response was not ok');
     }
-    return await response.json();
+    return response.json();
   } catch (error) {
     console.error('Error updating character:', error);
   }
@@ -49,16 +29,29 @@ function Characters() {
   const [editableTraits, setEditableTraits] = useState({});
   
   useEffect(() => {
-    fetchCharacters();
+    getCharacters();
   }, []);
 
-  const fetchCharacters = async () => {
-    try {
-      const response = await getCharacters();
-      setCharacters(response.data.characteristics);
-    } catch (error) {
+  const getCharacters = () => {
+    fetch('http://127.0.0.1:5000/characters', {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    })
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+      return response.json();
+    })
+    .then(data => {
+      console.log(data)
+      setCharacters(data)
+    })
+    .catch (error => {
       console.error('Error fetching characters:', error);
-    }
+    });
   };
   
   const handleCorrectTrait = (character, traitIndex) => {
@@ -116,55 +109,54 @@ function Characters() {
   }
 
   return (
-    <Box>
-      <Box>
-        {Object.keys(characters).map(character => (
-          <Button
-            key={character}
-            onClick={() => setSelectedCharacter(character)}
-            variant={selectedCharacter === character ? "contained" : "outlined"}
-            sx={{ margin: '5px' }}
-          >
-            {character}
-          </Button>
-        ))}
-      </Box>
-      {selectedCharacter && (
-        <Box mt={2}>
-          <Typography variant="h6">{selectedCharacter}</Typography>
-          {characters[selectedCharacter].split(', ').map((trait, index) => (
-            <Box key={index} display="flex" alignItems="center" mb={1}>
-              <Typography>{trait}</Typography>
-              <IconButton color="primary" sx={{ p: 0.5 }} onClick={() => handleCorrectTrait(selectedCharacter, index)}>
-                <CheckIcon />
-              </IconButton>
-              <IconButton color="secondary" sx={{ p: 0.5 }} onClick={() => handleIncorrectTrait(selectedCharacter, index)}>
-                <CloseIcon />
-              </IconButton>
-            </Box>
-          ))}
-          <TextField
-            label="Add Trait"
-            value={newTrait}
-            onChange={(e) => setNewTrait(e.target.value)}
-            variant="outlined"
-            size="small"
-            sx={{ marginTop: '10px' }}
-          />
-          <Button onClick={handleAddTrait} variant="contained" sx={{ marginTop: '10px' }}>
-            Add Trait
-          </Button>
-        </Box>
-      )}
-//       {characters.map(name => (
-//         <Character name={name}/>
-//       ))}
-
+    // <Box>
+    //   <Box>
+    //     {Object.keys(characters).map(character => (
+    //       <Button
+    //         key={character}
+    //         onClick={() => setSelectedCharacter(character)}
+    //         variant={selectedCharacter === character ? "contained" : "outlined"}
+    //         sx={{ margin: '5px' }}
+    //       >
+    //         {character}
+    //       </Button>
+    //     ))}
+    //   </Box>
+    //   {selectedCharacter && (
+    //     <Box mt={2}>
+    //       <Typography variant="h6">{selectedCharacter}</Typography>
+    //       {characters[selectedCharacter].split(', ').map((trait, index) => (
+    //         <Box key={index} display="flex" alignItems="center" mb={1}>
+    //           <Typography>{trait}</Typography>
+    //           <IconButton color="primary" sx={{ p: 0.5 }} onClick={() => handleCorrectTrait(selectedCharacter, index)}>
+    //             <CheckIcon />
+    //           </IconButton>
+    //           <IconButton color="secondary" sx={{ p: 0.5 }} onClick={() => handleIncorrectTrait(selectedCharacter, index)}>
+    //             <CloseIcon />
+    //           </IconButton>
+    //         </Box>
+    //       ))}
+    //       <TextField
+    //         label="Add Trait"
+    //         value={newTrait}
+    //         onChange={(e) => setNewTrait(e.target.value)}
+    //         variant="outlined"
+    //         size="small"
+    //         sx={{ marginTop: '10px' }}
+    //       />
+    //       <Button onClick={handleAddTrait} variant="contained" sx={{ marginTop: '10px' }}>
+    //         Add Trait
+    //       </Button>
+    //     </Box>
+    //   )}
+    <Box> 
+      {Object.keys(characters).map(name => (
+        <Character name={name}/>
+      ))} 
     </Box>
-  );
+   );
 }
 
-export default Characters;
 // {characters.map(character => (
 //   <Box key={character.id} mb={2}>
 //     <Button variant="outlined" onClick={() => setSelectedCharacter(character.id)}>
@@ -206,7 +198,7 @@ function Character(props) {
   }
 
   useEffect(() => {
-    fetch(`http://127.0.0.1/characters/${props.name}`,{ method: 'GET'})
+    fetch(`http://127.0.0.1:5000/characters/${props.name}`,{ method: 'GET'})
       .then(response => {
         if (!response.ok) {
           throw new Error('Network response was not ok');
@@ -235,15 +227,28 @@ function Character(props) {
   
   return (
     <Box>
-      {Object.entries(chapters).map((number, value) => (
-        <Chapter number={number}/>
+      {props.name}
+      {Object.entries(chapters).map(([number, traits]) => (
+        <Chapter number={number} traits={traits}/>
       ))}
     </Box>
   );
 }
 
-function Chapter(props){
-  return <p>{props.name}</p>
-}
+function Chapter({number, traits}){
+  const [traitsList, setTraitsList] = useState([])
+  useEffect(() => {
+    console.log('traits',(traits));
+    setTraitsList(traits)
+  }, []);
+
+  return ( 
+  <Box>
+    {number}
+    <ul>
+      {traits.map((trait, index) => ( <li>{trait}</li>))}
+    </ul>
+  </Box>
+)}
 
 export default Characters;

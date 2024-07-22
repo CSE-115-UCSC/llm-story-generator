@@ -7,7 +7,7 @@ from model.character import Character
 class Story:
     def __init__(self, name = None):
         self.name = name
-        self.chapters = [None]
+        self.chapters = [Chapter(text="", number=0)]
         self.prompts = [None]
         self.characters = {}
         self.number_chapters = len(self.chapters)
@@ -22,7 +22,10 @@ class Story:
     
     #return all chapters
     def get_chapters(self):
-        return [chapter.text for chapter in self.chapters[1:]]
+        if len(self.chapters)>0:
+            return [chapter.text for chapter in self.chapters[1:]]
+        else:
+            return []
 
     def get_summaries(self):
         sum_dict = {}
