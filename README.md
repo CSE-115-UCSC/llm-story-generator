@@ -86,33 +86,6 @@ The LLM Story Generator is a web application designed to assist writers by gener
 2. **API for Chapter Retrieval**
    - An API function to fetch and display all generated chapters, ensuring the latest content is available.
 
-## Installation and Setup
-
-1. **Clone the Repository**
-   ```bash
-   git clone git@github.com:vaishi01/llm-story-generator.git
-   ```
-
-2. **Install Dependencies**
-   ```bash
-   cd llm-story-generator
-   pip install -r requirements.txt
-   npm install
-   ```
-
-3. **Start the Backend Server**
-   ```bash
-   python3 routes.py
-   ```
-
-4. **Start the Frontend Server**
-   ```bash
-   npm start
-   ```
-
-5. **Access the Application**
-   Open your web browser and go to `http://localhost:3000`.
-
 ## Usage
 
 1. **Enter a Prompt**
