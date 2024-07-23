@@ -132,4 +132,4 @@ The LLM Story Generator is a web application designed to assist writers by gener
 
 ## Acknowledgements
 
-- Special thanks to all contributors and developers who made this project possible.
+- Special thanks to Professor Richard K. Jullig, CSE 115A Teaching Staff and Mr. Golam Md Muktadir who made this project possible.
