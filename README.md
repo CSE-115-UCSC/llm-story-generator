@@ -4,7 +4,7 @@
 
 # Installation
 
-### Frontend
+## Frontend
 In order to run llm-story-generator, must must install node.js, as well as [React](https://react.dev)
 
 ```npm install react```
@@ -13,7 +13,7 @@ Our frontend also uses the [MUI Component Library](https://mui.com) that impleme
 
 ```npm install @mui/material @emotion/react @emotion/styled @mui/icons-material```
 
-### Backend
+## Backend
 
 Our backend relies on OpenAI, so securing an API key is the first step. Create a ```.env``` file inside the project directory. OpenAI expects an environment variable called OPENAI_API_KEY. Add this on line 1:
 
